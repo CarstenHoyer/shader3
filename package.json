@@ -2,7 +2,11 @@
   "name": "shader3",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://carstenhoyer.github.io/shader3",
   "dependencies": {
+    "@react-spring/three": "^9.4.4",
+    "@react-three/drei": "^9.6.2",
+    "@react-three/fiber": "^8.0.12",
     "@testing-library/jest-dom": "^5.16.4",
     "@testing-library/react": "^13.1.1",
     "@testing-library/user-event": "^13.5.0",
@@ -10,13 +14,19 @@
     "@types/node": "^16.11.33",
     "@types/react": "^18.0.8",
     "@types/react-dom": "^18.0.3",
+    "babel-plugin-glsl": "^1.0.0",
+    "jotai": "^1.6.5",
     "react": "^18.1.0",
     "react-dom": "^18.1.0",
     "react-scripts": "5.0.1",
+    "three": "^0.140.0",
     "typescript": "^4.6.4",
+    "underscore": "^1.13.3",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
+    "predeploy": "npm run build",
+    "deploy": "gh-pages -d build",
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
@@ -39,5 +49,10 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "@types/three": "^0.139.0",
+    "@types/underscore": "^1.11.4",
+    "gh-pages": "^3.2.3"
   }
 }
