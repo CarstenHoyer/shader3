@@ -247,6 +247,9 @@ const App = () => {
         <ShowVideo videos={videoRefs.current} showIndex={showVideo} />
         <ambientLight />
         <pointLight position={[10, 10, 10]} />
+        <Text fontSize={0} characters="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!">
+          
+        </Text>
       </Canvas>) : null}
     </div>
   );
