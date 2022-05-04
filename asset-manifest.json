@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/shader3/static/css/main.9f517749.css",
-    "main.js": "/shader3/static/js/main.52f418ef.js",
+    "main.js": "/shader3/static/js/main.c95385f9.js",
     "static/js/787.75ffdb25.chunk.js": "/shader3/static/js/787.75ffdb25.chunk.js",
     "index.html": "/shader3/index.html",
     "main.9f517749.css.map": "/shader3/static/css/main.9f517749.css.map",
-    "main.52f418ef.js.map": "/shader3/static/js/main.52f418ef.js.map",
+    "main.c95385f9.js.map": "/shader3/static/js/main.c95385f9.js.map",
     "787.75ffdb25.chunk.js.map": "/shader3/static/js/787.75ffdb25.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.9f517749.css",
-    "static/js/main.52f418ef.js"
+    "static/js/main.c95385f9.js"
   ]
 }
