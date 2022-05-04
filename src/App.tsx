@@ -10,6 +10,7 @@ import { MeshDistortMaterial, shaderMaterial, Text } from '@react-three/drei';
 import { a } from '@react-spring/three'
 import { useSpring } from '@react-spring/three';
 import { atom, useAtom } from 'jotai'
+import { NONAME } from 'dns';
 
 const showVideoNumber = atom(null)
 
@@ -19,26 +20,26 @@ const data = [
   {
     title: 'LUCIFER RISING',
     director: 'Kenneth Anger',
-    titlePos: [11.4,2],
-    subtitlePos: [13.2,1.2],
+    titlePos: [0,0],
+    subtitlePos: [5,-.25],
   },
   {
     title: 'MEDITATION ON VIOLENCE',
     director: 'Maya Deren',
-    titlePos: [9,2],
-    subtitlePos: [13.4,1.3],
+    titlePos: [-4.7,0],
+    subtitlePos: [5.3,-.25],
   },
   {
     title: 'DOG STAR MAN',
     director: 'Stan Brakhage',
-    titlePos: [11.6,2],
-    subtitlePos: [13.4,1.3],
+    titlePos: [-.1,0],
+    subtitlePos: [5,-.25],
   },
   {
     title: 'MESHES OF THE AFTERNOON',
     director: 'Maya Deren',
-    titlePos: [8.4,2],
-    subtitlePos: [13.4,1.3],
+    titlePos: [-5.8,0],
+    subtitlePos: [5.3,-.25],
   }
 
 ]
@@ -198,7 +199,7 @@ const ShowVideo = (props: any) => {
   if (props.showIndex === null) return null
   const { showIndex: index } = props
 
-  const [titlePosX, titlePoxY]  = data[index].titlePos
+  const [titlePosX, titlePosY]  = data[index].titlePos
   const [subtitlePosX, subtitlePosY]  = data[index].subtitlePos
 
   return (
@@ -210,13 +211,15 @@ const ShowVideo = (props: any) => {
           <videoTexture args={[props.videos[props.showIndex].current]} attach="map" repeat={new THREE.Vector2(1,1)} offset={props.offset} />
         </fadeVideoMaterial>
       </a.mesh>
-      <Text position={new THREE.Vector3(-viewport.width * 0.5 + titlePosX, -viewport.height * 0.5 + titlePoxY, 0)} fontSize={1} letterSpacing={-0.05} lineHeight={1} characters="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!">
-        <textRenderMaterial />
-        {data[index].title}
-      </Text>
-      <Text position={new THREE.Vector3(-viewport.width * 0.5 + subtitlePosX, -viewport.height * 0.5 + subtitlePosY, 0)}  fontSize={0.5} letterSpacing={-0.05} lineHeight={1} characters="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!">
-        {data[index].director}
-      </Text>
+      <group position={new THREE.Vector3(viewport.width * 0.5 - 7, -viewport.height * 0.5 + 1, 0)}>
+        <Text position={new THREE.Vector3(titlePosX,titlePosY,0)} anchorX="left" anchorY="bottom" fontSize={1} letterSpacing={-0.05} lineHeight={1} characters="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!">
+          <textRenderMaterial />
+          {data[index].title}
+        </Text>
+        <Text position={new THREE.Vector3(subtitlePosX,subtitlePosY,0)} fontSize={0.5} letterSpacing={-0.05} lineHeight={1} characters="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!">
+          {data[index].director}
+        </Text>
+      </group>
     </group>
   )
 }
@@ -224,14 +227,22 @@ const ShowVideo = (props: any) => {
 const App = () => {
   const [showVideo] = useAtom(showVideoNumber)
   const [videosLoaded, setVideosLoaded] = useState(false)
-  const videos = ['./kenneth_small.mp4', './deren_small.mp4', './stan_small.mp4', './deren2_small.mp4']
+  const purl = process.env.PUBLIC_URL
+  const videos = [
+    `${purl}/kenneth_small.mp4`, 
+    `${purl}/deren_small.mp4`,
+    `${purl}/stan_small.mp4`, 
+    `${purl}/deren2_small.mp4`
+  ]
   const videoRefs = useRef(videos.map(v => createRef<HTMLVideoElement>()))
 
   const onVideosLoaded = after(videos.length, () => {
+    console.log('loaded')
     setVideosLoaded(true)
   })
 
   const onVideoLoad = () => {
+    console.log('load')
     onVideosLoaded()
   }
 
@@ -247,9 +258,6 @@ const App = () => {
         <ShowVideo videos={videoRefs.current} showIndex={showVideo} />
         <ambientLight />
         <pointLight position={[10, 10, 10]} />
-        <Text fontSize={0} characters="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!">
-          
-        </Text>
       </Canvas>) : null}
     </div>
   );

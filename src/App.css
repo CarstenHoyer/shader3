@@ -49,3 +49,8 @@
   object-fit: cover;
   opacity: 0;
 }
+
+/* @font-face {
+  font-family: 'Montserrat';
+  src: url(process.env.PUBLIC_URL + 'Montserrat-VariableFont_wght.ttf') format('ttf')
+} */
