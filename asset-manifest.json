@@ -1,16 +1,16 @@
 {
   "files": {
     "main.css": "/shader3/static/css/main.020b8b4b.css",
-    "main.js": "/shader3/static/js/main.9d013e57.js",
+    "main.js": "/shader3/static/js/main.a6b37e2b.js",
     "static/js/787.75ffdb25.chunk.js": "/shader3/static/js/787.75ffdb25.chunk.js",
     "static/media/Montserrat-VariableFont_wght.ttf": "/shader3/static/media/Montserrat-VariableFont_wght.3068cdb43142f5625baf.ttf",
     "index.html": "/shader3/index.html",
     "main.020b8b4b.css.map": "/shader3/static/css/main.020b8b4b.css.map",
-    "main.9d013e57.js.map": "/shader3/static/js/main.9d013e57.js.map",
+    "main.a6b37e2b.js.map": "/shader3/static/js/main.a6b37e2b.js.map",
     "787.75ffdb25.chunk.js.map": "/shader3/static/js/787.75ffdb25.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.020b8b4b.css",
-    "static/js/main.9d013e57.js"
+    "static/js/main.a6b37e2b.js"
   ]
 }
