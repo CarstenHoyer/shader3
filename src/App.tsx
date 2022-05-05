@@ -147,7 +147,7 @@ const BigVideoBlob = (props: any) => {
     >
       <icosahedronBufferGeometry args={[props.radius, 64]} />
       {/* @ts-ignore */ }
-      <AnimatedMaterial distort={props.distort || .2} transparent={true} color={props.color} envMapIntensity={env} clearcoat={coat} clearcoatRoughness={0} metalness={0.1}>
+      <AnimatedMaterial distort={props.distort || .3} transparent={true} color={props.color} envMapIntensity={env} clearcoat={coat} clearcoatRoughness={0} metalness={0.1}>
       </AnimatedMaterial>
       {props.video && (<AnimatedMaterial distort={props.distort || .2} transparent={true} color={props.video ? 'white' : props.color} envMapIntensity={env} clearcoat={coat} clearcoatRoughness={0} metalness={0.1}>
         <videoTexture ref={textureRef} format={THREE.RGBAFormat} args={[props.video]} attach="map" repeat={new THREE.Vector2(1,1)} offset={props.offset} />
@@ -211,7 +211,7 @@ const VideoBlob = (props: any) => {
     >
       <icosahedronBufferGeometry args={[props.radius, 12]} />
       {/* @ts-ignore */ }
-      <AnimatedMaterial distort={props.distort || .2} transparent={true} color={props.color} envMapIntensity={env} clearcoat={coat} clearcoatRoughness={0} metalness={0.1}>
+      <AnimatedMaterial distort={props.distort || .5} transparent={true} color={props.color} envMapIntensity={env} clearcoat={coat} clearcoatRoughness={0} metalness={0.1}>
         <videoTexture format={THREE.RGBAFormat} args={[props.video]} attach="map" repeat={new THREE.Vector2(1,1)} offset={props.offset} />
       </AnimatedMaterial>
     </a.mesh>
@@ -224,7 +224,7 @@ const Scene = (props: any) => {
   const [showVideo] = useAtom(showVideoNumber)
   const { viewport } = useThree()
   const { videos } = props
-  const radius = Math.min(1.5, viewport.width * 0.07)
+  const radius = Math.min(1.5, viewport.width * 0.08)
   const centerRadius = Math.min(viewport.height * 0.80, viewport.width * 0.80)
   const video = showVideo !== null ? videos[showVideo].current : null
   return (
