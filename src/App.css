@@ -50,7 +50,8 @@
   opacity: 0;
 }
 
-/* @font-face {
+@font-face {
   font-family: 'Montserrat';
-  src: url(process.env.PUBLIC_URL + 'Montserrat-VariableFont_wght.ttf') format('ttf')
-} */
+  src: local("Montserrat"),
+  url("./fonts/Montserrat/Montserrat-VariableFont_wght.ttf") format("truetype");
+}

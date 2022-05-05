@@ -1,4 +1,4 @@
-import React, {createRef, useMemo, useRef, useState} from 'react';
+import React, {createRef, useEffect, useMemo, useRef, useState} from 'react';
 import { extend } from '@react-three/fiber'
 import glsl from 'babel-plugin-glsl/macro'
 import * as THREE from 'three';
@@ -6,11 +6,12 @@ import { after } from 'underscore'
 import './App.css';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import Video from './Video';
-import { MeshDistortMaterial, shaderMaterial, Text } from '@react-three/drei';
+import { ContactShadows, MeshDistortMaterial, PerspectiveCamera, shaderMaterial, Text } from '@react-three/drei';
 import { a } from '@react-spring/three'
 import { useSpring } from '@react-spring/three';
 import { atom, useAtom } from 'jotai'
-import { NONAME } from 'dns';
+import { CompressedTextureLoader, MeshPhysicalMaterial } from 'three';
+import { isNonNullExpression } from 'typescript';
 
 const showVideoNumber = atom(null)
 
@@ -90,6 +91,74 @@ const TextRenderMaterial = shaderMaterial(
 extend({ TextRenderMaterial })
 extend({ FadeVideoMaterial })
 
+const BigVideoBlob = (props: any) => {
+  const textureRef = useRef<THREE.VideoTexture>(null)
+  const ref = useRef<THREE.Mesh>()
+  const [showVideo, setShowVideo] = useAtom(showVideoNumber)
+  const [hovered, setHovered] = useState(false)
+  const [mode, setMode] = useState(false)
+  const [down, setDown] = useState(false)
+  // Springs for color and overall looks, this is state-driven animation
+  // React-spring is physics based and turns static props into animated values
+  const [{ wobble, coat, env }] = useSpring(
+    {
+      wobble: down ? 1.05 * props.scale : hovered ? 1.02 * props.scale : 1 * props.scale,
+      coat: mode && !hovered ? 4 : 2,
+      env: mode && !hovered ? 4 : 10,
+      config: (n) => {
+        if (n === 'wobble' && hovered) {
+          return { mass: 2, tension: 1000, friction: 10 }
+        }
+        return{}
+      }
+    },
+    [mode, hovered, down]
+  )
+
+  const xDir = useMemo(() => Math.round(Math.random()) ? 1 : -1, [])
+  const yDir = useMemo(() => Math.round(Math.random()) ? 1 : -1, [])
+
+  useFrame(({clock}) => {
+    if (!ref.current) return
+    ref.current.position.x = props.position[0] + (xDir * (Math.sin(clock.elapsedTime * 0.5) * 0.15))
+    ref.current.position.y = props.position[1] + (yDir * (Math.sin(clock.elapsedTime * 0.5) * 0.2))
+  })
+
+  return (
+    <group>
+      {/* <ContactShadows
+        rotation={[Math.PI / 2, 0, 0]}
+        position={[0, -1.6, -1]}
+        opacity={mode ? 0.8 : 0.4}
+        width={15}
+        height={15}
+        blur={2.5}
+        far={1.6}
+      /> */}
+    <a.mesh {...props}
+      ref={ref}
+      onPointerOver={() => setHovered(true)}
+      onPointerOut={() => setHovered(false)}
+      onPointerDown={() => setDown(true)}
+      onPointerUp={() => {
+        setDown(false)
+      }}
+      scale={wobble}
+    >
+      <icosahedronBufferGeometry args={[props.radius, 64]} />
+      {/* @ts-ignore */ }
+      <AnimatedMaterial distort={props.distort || .2} transparent={true} color={props.color} envMapIntensity={env} clearcoat={coat} clearcoatRoughness={0} metalness={0.1}>
+      </AnimatedMaterial>
+      {props.video && (<AnimatedMaterial distort={props.distort || .2} transparent={true} color={props.video ? 'white' : props.color} envMapIntensity={env} clearcoat={coat} clearcoatRoughness={0} metalness={0.1}>
+        <videoTexture ref={textureRef} format={THREE.RGBAFormat} args={[props.video]} attach="map" repeat={new THREE.Vector2(1,1)} offset={props.offset} />
+      </AnimatedMaterial>)}
+    </a.mesh>
+
+
+    </group>
+  )
+}
+
 const VideoBlob = (props: any) => {
   const ref = useRef<THREE.Mesh>()
   const [showVideo, setShowVideo] = useAtom(showVideoNumber)
@@ -123,6 +192,7 @@ const VideoBlob = (props: any) => {
   })
 
   return (
+    <group>
     <a.mesh {...props}
       ref={ref}
       onPointerOver={() => setHovered(true)}
@@ -141,25 +211,40 @@ const VideoBlob = (props: any) => {
     >
       <icosahedronBufferGeometry args={[props.radius, 12]} />
       {/* @ts-ignore */ }
-      <AnimatedMaterial transparent={true} color={props.color} envMapIntensity={env} clearcoat={coat} clearcoatRoughness={0} metalness={0.1}>
+      <AnimatedMaterial distort={props.distort || .2} transparent={true} color={props.color} envMapIntensity={env} clearcoat={coat} clearcoatRoughness={0} metalness={0.1}>
         <videoTexture format={THREE.RGBAFormat} args={[props.video]} attach="map" repeat={new THREE.Vector2(1,1)} offset={props.offset} />
       </AnimatedMaterial>
     </a.mesh>
+
+    </group>
   )
 }
 
 const Scene = (props: any) => {
+  const [showVideo] = useAtom(showVideoNumber)
   const { viewport } = useThree()
   const { videos } = props
-  const radius = 1
+  const radius = Math.min(1.5, viewport.width * 0.07)
+  const centerRadius = Math.min(viewport.height * 0.80, viewport.width * 0.80)
+  const video = showVideo !== null ? videos[showVideo].current : null
   return (
     <>
+    <BigVideoBlob 
+      distort={.12}
+      index={3}
+      video={video}
+      scale={1}
+      radius={centerRadius}
+      position={[0,0,-8]}
+      color="lightpink"
+      offset={new THREE.Vector2(-0.3,0)}
+    />
      <VideoBlob
       index={0}
       video={videos[0].current}
       scale={1}
       radius={radius}
-      position={[(-viewport.width * 0.5 + radius * 2), (viewport.height * 0.5 - radius * 2), 0]}
+      position={[-viewport.width * 0.5 + radius * 2.5,viewport.height * 0.5 - radius * 2.5,0]}
       color="hotpink"
       offset={new THREE.Vector2(0,0)}
     /> 
@@ -168,7 +253,7 @@ const Scene = (props: any) => {
       video={videos[1].current}
       scale={.7}
       radius={radius}
-      position={[(-viewport.width * 0.5 + radius * 2) + viewport.width * 0.25, (viewport.height * 0.5 - radius * 2) + .4, 0]}
+      position={[-viewport.width * .25 + radius * 2.5,viewport.height * 0.5 - radius * 1.5,0]}
       offset={new THREE.Vector2(-0.3, -0.1)}
       color="gold"
     /> 
@@ -177,7 +262,7 @@ const Scene = (props: any) => {
       video={videos[2].current}
       scale={.75}
       radius={radius}
-      position={[(viewport.width * 0.5 - radius * 2) - viewport.width * 0.25, (viewport.height * 0.5 - radius * 2) + .7, 0]}
+      position={[-viewport.width * 0 + radius * 2.5,viewport.height * 0.5 - radius * 2,0]}
       color="white"
       offset={new THREE.Vector2(0,0)}
     /> 
@@ -186,7 +271,7 @@ const Scene = (props: any) => {
       video={videos[3].current}
       scale={.95}
       radius={radius}
-      position={[(viewport.width * 0.5 - radius * 2), (viewport.height * 0.5 - radius * 2) + 0.5, 0]}
+      position={[-viewport.width * -.25 + radius * 2.5,viewport.height * 0.5 - radius * 4,0]}
       color="lightgreen"
       offset={new THREE.Vector2(-0.3,0)}
     /> 
@@ -196,30 +281,31 @@ const Scene = (props: any) => {
 
 const ShowVideo = (props: any) => {
   const { viewport } = useThree()
-  if (props.showIndex === null) return null
+  // 30.7 = 2.5
+  // 15.62 = 1.27
+  // 10 = 0.81
+  const titleRef = useRef<THREE.Mesh>(null)
+
+  useFrame(() => {
+    if (!titleRef.current) return
+    titleRef.current.scale.set(1,1,1)
+  })
+
   const { showIndex: index } = props
 
-  const [titlePosX, titlePosY]  = data[index].titlePos
-  const [subtitlePosX, subtitlePosY]  = data[index].subtitlePos
+  console.log({data, index})
 
   return (
     <group>
-      <a.mesh {...props}>
-        <planeBufferGeometry args={[viewport.width, viewport.height, 100, 100]} />
-        {/* @ts-ignore */ }
-        <fadeVideoMaterial>
-          <videoTexture args={[props.videos[props.showIndex].current]} attach="map" repeat={new THREE.Vector2(1,1)} offset={props.offset} />
-        </fadeVideoMaterial>
-      </a.mesh>
-      <group position={new THREE.Vector3(viewport.width * 0.5 - 7, -viewport.height * 0.5 + 1, 0)}>
-        <Text position={new THREE.Vector3(titlePosX,titlePosY,0)} anchorX="left" anchorY="bottom" fontSize={1} letterSpacing={-0.05} lineHeight={1} characters="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!">
+      {props.showIndex !== null && (<group position={new THREE.Vector3(0, -1, -1)}>
+        <Text ref={titleRef} position={new THREE.Vector3(0,0,0)}  fontSize={viewport.width * 0.071} letterSpacing={-0.05} lineHeight={1} characters="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!">
           <textRenderMaterial />
           {data[index].title}
         </Text>
-        <Text position={new THREE.Vector3(subtitlePosX,subtitlePosY,0)} fontSize={0.5} letterSpacing={-0.05} lineHeight={1} characters="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!">
+        <Text color="lightgrey" position={new THREE.Vector3(0,-.75,0)} fontSize={viewport.width * 0.03} letterSpacing={-0.05} lineHeight={1} characters="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!">
           {data[index].director}
         </Text>
-      </group>
+      </group>)}
     </group>
   )
 }
@@ -237,13 +323,26 @@ const App = () => {
   const videoRefs = useRef(videos.map(v => createRef<HTMLVideoElement>()))
 
   const onVideosLoaded = after(videos.length, () => {
-    console.log('loaded')
     setVideosLoaded(true)
   })
 
   const onVideoLoad = () => {
-    console.log('load')
     onVideosLoaded()
+  }
+
+  const MyCamera = () => {
+    const camera = useRef<THREE.PerspectiveCamera>(null)
+
+    useFrame(({ clock }) => {
+      if (!camera.current) return
+      const a = clock.getElapsedTime()
+      camera.current.position.set(Math.sin(a * 0.25) * 2,0,10)
+      camera.current.lookAt(new THREE.Vector3(0,0,0))
+    })
+
+    return (
+      <PerspectiveCamera ref={camera} makeDefault position={[0, 0, 4]} fov={50} />
+    )
   }
 
   return (
@@ -253,7 +352,13 @@ const App = () => {
           <Video key={index} ref={videoRefs.current[index]} src={video} autoPlay muted loop onLoad={onVideoLoad} />  
         ))}
       </div>
-      {videosLoaded ? (<Canvas orthographic dpr={[1,2]} camera={{ zoom: 100, position: [0, 0, 100] }}>
+      {videosLoaded ? (<Canvas dpr={[1,2]}>
+        <MyCamera />
+        
+        <mesh position={new THREE.Vector3(0,0,-10)}>
+          <planeBufferGeometry args={[100, 100]} />
+          <meshBasicMaterial color="lightpink" />
+        </mesh>
         <Scene videos={videoRefs.current} />
         <ShowVideo videos={videoRefs.current} showIndex={showVideo} />
         <ambientLight />
