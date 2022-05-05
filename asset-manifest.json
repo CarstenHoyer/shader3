@@ -1,15 +1,16 @@
 {
   "files": {
-    "main.css": "/shader3/static/css/main.9f517749.css",
-    "main.js": "/shader3/static/js/main.c95385f9.js",
+    "main.css": "/shader3/static/css/main.020b8b4b.css",
+    "main.js": "/shader3/static/js/main.9d013e57.js",
     "static/js/787.75ffdb25.chunk.js": "/shader3/static/js/787.75ffdb25.chunk.js",
+    "static/media/Montserrat-VariableFont_wght.ttf": "/shader3/static/media/Montserrat-VariableFont_wght.3068cdb43142f5625baf.ttf",
     "index.html": "/shader3/index.html",
-    "main.9f517749.css.map": "/shader3/static/css/main.9f517749.css.map",
-    "main.c95385f9.js.map": "/shader3/static/js/main.c95385f9.js.map",
+    "main.020b8b4b.css.map": "/shader3/static/css/main.020b8b4b.css.map",
+    "main.9d013e57.js.map": "/shader3/static/js/main.9d013e57.js.map",
     "787.75ffdb25.chunk.js.map": "/shader3/static/js/787.75ffdb25.chunk.js.map"
   },
   "entrypoints": [
-    "static/css/main.9f517749.css",
-    "static/js/main.c95385f9.js"
+    "static/css/main.020b8b4b.css",
+    "static/js/main.9d013e57.js"
   ]
 }
